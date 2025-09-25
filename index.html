@@ -153,7 +153,8 @@
         </div>
     </div>
     <script>
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx-VXraLQ1aMizP0LBclYsONBCGMDis8_yIGCc-ab8ah1ZMTsKA4zR1C94ljq_nOmon/exec';
+        // Variabel untuk menghubungkan ke Google Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx-VXraLQ1aMizP0LBclYsONBCGMDis8_yIGCc-ab8ah1ZMTsKA4zR1C94ljq_nOmon/exec';
         let studentName = "";
         
         const questions = {
@@ -225,6 +226,7 @@
         let currentScore = 0;
         let levelQuestions = [];
         let totalScore = 0;
+        let studentName = "";
         let levelAnswers = [];
 
         const introScreen = document.getElementById('intro-screen');
@@ -291,18 +293,16 @@
             submitBtn.style.display = 'inline-block';
             nextBtn.style.display = 'none';
             
-            // Tambahkan data soal ke array jawaban
             levelAnswers.push({ question: q.q, answer: null, status: null });
 
-            // Show/hide input fields based on level
-            if (currentLevel === 0 || currentLevel === 1) { // Levels with ratio input
+            if (currentLevel === 0 || currentLevel === 1) {
                 ratioInputGroup.style.display = 'flex';
                 singleAnswerInput.style.display = 'none';
                 answerInput1.value = '';
                 answerInput2.value = '';
                 answerInput1.disabled = false;
                 answerInput2.disabled = false;
-            } else { // Levels with single number input
+            } else {
                 ratioInputGroup.style.display = 'none';
                 singleAnswerInput.style.display = 'inline-block';
                 singleAnswerInput.value = '';
@@ -324,7 +324,7 @@
             
             currentAnswerData.answer = userAnswer;
 
-            if (currentLevel === 0) { // Level 1 - Flexible Answers
+            if (currentLevel === 0) {
                 const userParts = userAnswer.split(':');
                 const correctParts = correctAnswer.split(':');
                 if (userParts.length === 2 && correctParts.length === 2) {
@@ -334,7 +334,7 @@
                         isCorrect = true;
                     }
                 }
-            } else { // Other levels - Strict Answers
+            } else {
                 if (userAnswer === correctAnswer) {
                     isCorrect = true;
                 }
@@ -370,11 +370,10 @@
         function endLevel() {
             totalScore += currentScore;
             
-            // Kirim data untuk setiap soal di level ini ke Google Sheets
             levelAnswers.forEach(data => {
                 sendDataToSheet(data.question, data.answer, data.status);
             });
-            levelAnswers = []; // Reset array untuk level selanjutnya
+            levelAnswers = [];
 
             currentLevel++;
             if (currentLevel < levels.length) {
@@ -418,8 +417,7 @@
             formData.append('status', status);
             
             try {
-                // Perhatikan bahwa mode 'no-cors' tidak lagi diperlukan jika di-host di GitHub Pages
-                await fetch(WEB_APP_URL, {
+                await fetch(SCRIPT_URL, {
                     method: 'POST',
                     body: formData
                 });
@@ -430,6 +428,3 @@
     </script>
 </body>
 </html>
-
-
-
