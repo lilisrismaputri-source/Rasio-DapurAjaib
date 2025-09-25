@@ -152,94 +152,10 @@
             <button onclick="resetGame()">Main Lagi!</button>
         </div>
     </div>
-
-// Tambahkan di bagian atas script, di bawah variabel yang sudah ada
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwhKGpQQ3KnRt7fJesbfWyWynKSMRTrjQSgQ1h8KfS90RyHWbY-vNIKKVTaF1zPOMtz/exec";
-let studentName = "";
-
-// ... kode lainnya ...
-
-// Tambahkan variabel untuk melacak setiap jawaban per level
-let levelAnswers = [];
-
-// ... di dalam fungsi showQuestion()
-function showQuestion() {
-    // ... kode yang sudah ada ...
-    // Reset jawaban untuk soal ini
-    levelAnswers.push({ question: levelQuestions[currentQuestionIndex].q, answer: null, status: null });
-}
-
-// ... di dalam fungsi checkAnswer()
-function checkAnswer() {
-    // ... kode yang sudah ada ...
-
-    const currentAnswerData = levelAnswers[currentQuestionIndex];
-    let isCorrect = false;
-
-    // ... logika jawaban benar/salah yang sudah ada ...
-
-    if (isCorrect) {
-        currentScore += 25;
-        scoreDisplay.textContent = currentScore;
-        feedbackText.textContent = "Jawaban benar! 🎉";
-        feedbackText.className = 'feedback correct';
-        currentAnswerData.status = 'Benar';
-    } else {
-        feedbackText.textContent = "Jawaban salah.";
-        feedbackText.className = 'feedback incorrect';
-        currentAnswerData.status = 'Salah';
-    }
-
-    // Ambil jawaban dari input
-    if (currentLevel === 0 || currentLevel === 1) {
-        currentAnswerData.answer = `${answerInput1.value.trim()}:${answerInput2.value.trim()}`;
-    } else {
-        currentAnswerData.answer = singleAnswerInput.value.trim();
-    }
-    
-    // ... kode lainnya ...
-}
-
-// Tambahkan fungsi baru ini untuk mengirim data setiap kali level selesai
-function endLevel() {
-    totalScore += currentScore;
-    
-    // Kirim data untuk setiap soal di level ini ke Google Sheets
-    levelAnswers.forEach(data => {
-        sendDataToSheet(data.question, data.answer, data.status);
-    });
-    levelAnswers = []; // Reset array untuk level selanjutnya
-
-    currentLevel++;
-    if (currentLevel < levels.length) {
-        alert(`Level ${currentLevel} Selesai! Skor Level Ini: ${currentScore}. Lanjut ke Level ${currentLevel + 1}!`);
-        loadLevel();
-    } else {
-        showEndScreen();
-    }
-}
-
-// Tambahkan fungsi ini di bawah kode JavaScript
-async function sendDataToSheet(question, answer, status) {
-    const formData = new FormData();
-    formData.append('nama', studentName);
-    formData.append('level', `Level ${currentLevel}`);
-    formData.append('skor', currentScore);
-    formData.append('jawaban', `${question} | Jawaban Siswa: ${answer}`);
-    formData.append('status', status);
-
-    try {
-        await fetch(WEB_APP_URL, {
-            method: 'POST',
-            body: formData,
-            mode: 'no-cors' // Penting untuk menghindari CORS error
-        });
-    } catch(error) {
-        console.error('Error saat mengirim data:', error);
-    }
-}
-
     <script>
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwhKGpQQ3KnRt7fJesbfWyWynKSMRTrjQSgQ1h8KfS90RyHWbY-vNIKKVTaF1zPOMtz/exec';
+        let studentName = "";
+        
         const questions = {
             level1: [
                 { q: "Untuk membuat jus stroberi, Koki Cilik menggunakan 🍓 4 buah stroberi dan 🍎 8 buah apel. Berapa rasio stroberi terhadap apel?", a: "4:8" },
@@ -291,7 +207,7 @@ async function sendDataToSheet(question, answer, status) {
             ],
             level5: [
                 { q: "Jika 3 koki bisa membuat kue dalam 4 jam, berapa jam yang dibutuhkan oleh 6 koki untuk membuat kue yang sama?", a: "2" },
-                { q: "Jika 2 oven bisa memanggang kue dalam 30 menit, berapa menit waktu yang dibutuhkan jika menggunakan 4 oven?", a: "15" },
+                { q: "Untuk memanggang kue, Koki Cilik butuh 2 oven selama 30 menit. Jika dia menggunakan 4 oven, berapa menit waktu yang dibutuhkan?", a: "15" },
                 { q: "Jika 5 orang bisa menghabiskan 10 liter air dalam 2 hari, berapa hari air akan habis jika ada 10 orang?", a: "1" },
                 { q: "Jika 6 pekerja bisa menyelesaikan proyek dalam 10 hari, berapa hari yang dibutuhkan 5 pekerja untuk menyelesaikan proyek yang sama?", a: "12" },
                 { q: "Koki Cilik punya 2 keran yang bisa mengisi tangki dalam 6 jam. Berapa jam waktu yang dibutuhkan jika dia menggunakan 3 keran?", a: "4" },
@@ -309,7 +225,7 @@ async function sendDataToSheet(question, answer, status) {
         let currentScore = 0;
         let levelQuestions = [];
         let totalScore = 0;
-        let studentName = "";
+        let levelAnswers = [];
 
         const introScreen = document.getElementById('intro-screen');
         const gameScreen = document.getElementById('game-screen');
@@ -374,6 +290,9 @@ async function sendDataToSheet(question, answer, status) {
             feedbackText.textContent = '';
             submitBtn.style.display = 'inline-block';
             nextBtn.style.display = 'none';
+            
+            // Tambahkan data soal ke array jawaban
+            levelAnswers.push({ question: q.q, answer: null, status: null });
 
             // Show/hide input fields based on level
             if (currentLevel === 0 || currentLevel === 1) { // Levels with ratio input
@@ -393,6 +312,7 @@ async function sendDataToSheet(question, answer, status) {
 
         function checkAnswer() {
             let userAnswer = '';
+            const currentAnswerData = levelAnswers[currentQuestionIndex];
             const correctAnswer = levelQuestions[currentQuestionIndex].a;
             let isCorrect = false;
 
@@ -401,6 +321,8 @@ async function sendDataToSheet(question, answer, status) {
             } else {
                 userAnswer = singleAnswerInput.value.trim();
             }
+            
+            currentAnswerData.answer = userAnswer;
 
             if (currentLevel === 0) { // Level 1 - Flexible Answers
                 const userParts = userAnswer.split(':');
@@ -423,9 +345,11 @@ async function sendDataToSheet(question, answer, status) {
                 scoreDisplay.textContent = currentScore;
                 feedbackText.textContent = "Jawaban benar! 🎉";
                 feedbackText.className = 'feedback correct';
+                currentAnswerData.status = 'Benar';
             } else {
                 feedbackText.textContent = "Jawaban salah.";
                 feedbackText.className = 'feedback incorrect';
+                currentAnswerData.status = 'Salah';
             }
 
             submitBtn.style.display = 'none';
@@ -445,6 +369,13 @@ async function sendDataToSheet(question, answer, status) {
 
         function endLevel() {
             totalScore += currentScore;
+            
+            // Kirim data untuk setiap soal di level ini ke Google Sheets
+            levelAnswers.forEach(data => {
+                sendDataToSheet(data.question, data.answer, data.status);
+            });
+            levelAnswers = []; // Reset array untuk level selanjutnya
+
             currentLevel++;
             if (currentLevel < levels.length) {
                 alert(`Level ${currentLevel} Selesai! Skor Level Ini: ${currentScore}. Lanjut ke Level ${currentLevel + 1}!`);
@@ -476,6 +407,25 @@ async function sendDataToSheet(question, answer, status) {
                 [array[i], array[j]] = [array[j], array[i]];
             }
             return array;
+        }
+
+        async function sendDataToSheet(question, answer, status) {
+            const formData = new FormData();
+            formData.append('nama', studentName);
+            formData.append('level', `Level ${currentLevel + 1}`);
+            formData.append('skor', currentScore);
+            formData.append('jawaban', `${question} | Jawaban Siswa: ${answer}`);
+            formData.append('status', status);
+            
+            try {
+                // Perhatikan bahwa mode 'no-cors' tidak lagi diperlukan jika di-host di GitHub Pages
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+            } catch(error) {
+                console.error('Error saat mengirim data:', error);
+            }
         }
     </script>
 </body>
