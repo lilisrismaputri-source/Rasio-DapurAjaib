@@ -152,6 +152,93 @@
             <button onclick="resetGame()">Main Lagi!</button>
         </div>
     </div>
+
+// Tambahkan di bagian atas script, di bawah variabel yang sudah ada
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwhKGpQQ3KnRt7fJesbfWyWynKSMRTrjQSgQ1h8KfS90RyHWbY-vNIKKVTaF1zPOMtz/exec";
+let studentName = "";
+
+// ... kode lainnya ...
+
+// Tambahkan variabel untuk melacak setiap jawaban per level
+let levelAnswers = [];
+
+// ... di dalam fungsi showQuestion()
+function showQuestion() {
+    // ... kode yang sudah ada ...
+    // Reset jawaban untuk soal ini
+    levelAnswers.push({ question: levelQuestions[currentQuestionIndex].q, answer: null, status: null });
+}
+
+// ... di dalam fungsi checkAnswer()
+function checkAnswer() {
+    // ... kode yang sudah ada ...
+
+    const currentAnswerData = levelAnswers[currentQuestionIndex];
+    let isCorrect = false;
+
+    // ... logika jawaban benar/salah yang sudah ada ...
+
+    if (isCorrect) {
+        currentScore += 25;
+        scoreDisplay.textContent = currentScore;
+        feedbackText.textContent = "Jawaban benar! 🎉";
+        feedbackText.className = 'feedback correct';
+        currentAnswerData.status = 'Benar';
+    } else {
+        feedbackText.textContent = "Jawaban salah.";
+        feedbackText.className = 'feedback incorrect';
+        currentAnswerData.status = 'Salah';
+    }
+
+    // Ambil jawaban dari input
+    if (currentLevel === 0 || currentLevel === 1) {
+        currentAnswerData.answer = `${answerInput1.value.trim()}:${answerInput2.value.trim()}`;
+    } else {
+        currentAnswerData.answer = singleAnswerInput.value.trim();
+    }
+    
+    // ... kode lainnya ...
+}
+
+// Tambahkan fungsi baru ini untuk mengirim data setiap kali level selesai
+function endLevel() {
+    totalScore += currentScore;
+    
+    // Kirim data untuk setiap soal di level ini ke Google Sheets
+    levelAnswers.forEach(data => {
+        sendDataToSheet(data.question, data.answer, data.status);
+    });
+    levelAnswers = []; // Reset array untuk level selanjutnya
+
+    currentLevel++;
+    if (currentLevel < levels.length) {
+        alert(`Level ${currentLevel} Selesai! Skor Level Ini: ${currentScore}. Lanjut ke Level ${currentLevel + 1}!`);
+        loadLevel();
+    } else {
+        showEndScreen();
+    }
+}
+
+// Tambahkan fungsi ini di bawah kode JavaScript
+async function sendDataToSheet(question, answer, status) {
+    const formData = new FormData();
+    formData.append('nama', studentName);
+    formData.append('level', `Level ${currentLevel}`);
+    formData.append('skor', currentScore);
+    formData.append('jawaban', `${question} | Jawaban Siswa: ${answer}`);
+    formData.append('status', status);
+
+    try {
+        await fetch(WEB_APP_URL, {
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors' // Penting untuk menghindari CORS error
+        });
+    } catch(error) {
+        console.error('Error saat mengirim data:', error);
+    }
+}
+
     <script>
         const questions = {
             level1: [
