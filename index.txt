@@ -154,7 +154,6 @@
     </div>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx-VXraLQ1aMizP0LBclYsONBCGMDis8_yIGCc-ab8ah1ZMTsKA4zR1C94ljq_nOmon/exec';
-        let studentName = "";
         
         const questions = {
             level1: [
@@ -426,4 +425,5 @@
         }
     </script>
 </body>
+
 </html>
