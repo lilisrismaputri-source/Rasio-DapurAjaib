@@ -154,7 +154,7 @@
     </div>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwGGsU-1AxVBQJ5EO6mJmk5QQc9e-Iz3ulZBtvq4yWB_eZFDfFB6pMOCJS-TIryTCgo/exec';
-        
+                
         const questions = {
             level1: [
                 { q: "Untuk membuat jus stroberi, Koki Cilik menggunakan 🍓 4 buah stroberi dan 🍎 8 buah apel. Berapa rasio stroberi terhadap apel?", a: "4:8" },
@@ -343,11 +343,11 @@
                 scoreDisplay.textContent = currentScore;
                 feedbackText.textContent = "Jawaban benar! 🎉";
                 feedbackText.className = 'feedback correct';
-                currentAnswerData.status = 'Benar';
+                currentAnswerData.status = '25';
             } else {
                 feedbackText.textContent = "Jawaban salah.";
                 feedbackText.className = 'feedback incorrect';
-                currentAnswerData.status = 'Salah';
+                currentAnswerData.status = '0';
             }
 
             submitBtn.style.display = 'none';
@@ -436,4 +436,3 @@
     </script>
 </body>
 </html>
-
