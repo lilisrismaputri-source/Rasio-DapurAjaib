@@ -154,7 +154,8 @@
     </div>
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbznzqvxKsemj5Mpxc_1CvmbVMRIT1QNLBSF_0Xc6vOytv-WYKum5spqhkGTQkkRFxpv/exec';
-               
+        let studentName = "";
+        
         const questions = {
             level1: [
                 { q: "Untuk membuat jus stroberi, Koki Cilik menggunakan 🍓 4 buah stroberi dan 🍎 8 buah apel. Berapa rasio stroberi terhadap apel?", a: "4:8" },
@@ -365,17 +366,19 @@
             showQuestion();
         }
 
+        // GANTI FUNGSI LAMA DENGAN INI
         function endLevel() {
             totalScore += currentScore;
             
-            levelAnswers.forEach(data => {
-                sendDataToSheet(data.question, data.answer, data.status);
-            });
-            levelAnswers = [];
+            // Kirim semua data jawaban level ini sekaligus
+            sendDataToSheet(levelAnswers);
+            levelAnswers = []; // Kosongkan setelah dikirim
 
-            currentLevel++;
+            const levelYangSelesai = currentLevel + 1;
+            currentLevel++; // Pindahkan kenaikan level ke sini, SETELAH data dikirim
+
             if (currentLevel < levels.length) {
-                alert(`Level ${currentLevel} Selesai! Skor Level Ini: ${currentScore}. Lanjut ke Level ${currentLevel + 1}!`);
+                alert(`Level ${levelYangSelesai} Selesai! Skor Level Ini: ${currentScore}. Lanjut ke Level ${currentLevel + 1}!`);
                 loadLevel();
             } else {
                 showEndScreen();
@@ -406,31 +409,31 @@
             return array;
         }
 
-        // Ganti seluruh fungsi sendDataToSheet() dengan kode di bawah ini
-async function sendDataToSheet(question, answer, status) {
-    const params = {
-        nama: studentName,
-        level: `Level ${currentLevel + 1}`,
-        skor: currentScore,
-        jawaban: `${question} | Jawaban Siswa: ${answer}`,
-        status: status
-    };
+        // GANTI JUGA FUNGSI INI UNTUK MENGIRIM DATA SECARA KOLEKTIF
+        async function sendDataToSheet(answers) {
+            const params = {
+                nama: studentName,
+                level: `Level ${currentLevel + 1}`,
+                skor: currentScore,
+                jawaban: JSON.stringify(answers) // Mengubah array jawaban menjadi string JSON
+            };
 
-    const formData = new URLSearchParams(params).toString();
-    
-    try {
-        await fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+            const formData = new URLSearchParams(params).toString();
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                });
+                const result = await response.json();
+                console.log('Sukses:', result); // Untuk debugging
+            } catch(error) {
+                console.error('Error saat mengirim data:', error);
             }
-        });
-    } catch(error) {
-        console.error('Error saat mengirim data:', error);
-    }
-}
+        }
     </script>
 </body>
 </html>
-
